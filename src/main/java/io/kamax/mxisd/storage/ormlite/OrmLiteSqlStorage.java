@@ -81,6 +81,7 @@ public class OrmLiteSqlStorage implements IStorage {
 
     public static class Migrations {
         public static final String FIX_ACCEPTED_DAO = "2019_12_09__2254__fix_accepted_dao";
+        public static final String FIX_HASH_DAO_UNIQUE_INDEX = "2020_03_22__1153__fix_hash_dao_unique_index";
     }
 
     private Dao<ThreePidInviteIO, String> invDao;
@@ -127,12 +128,24 @@ public class OrmLiteSqlStorage implements IStorage {
             fixAcceptedDao(connPol);
             changelogDao.create(new ChangelogDao(Migrations.FIX_ACCEPTED_DAO, new Date(), "Recreate the accepted table."));
         }
+        ChangelogDao fixHashDaoUniqueIndex = changelogDao.queryForId(Migrations.FIX_HASH_DAO_UNIQUE_INDEX);
+        if (fixHashDaoUniqueIndex == null) {
+            fixHashDaoUniqueIndex(connPol);
+            changelogDao
+                .create(new ChangelogDao(Migrations.FIX_HASH_DAO_UNIQUE_INDEX, new Date(), "Add the id and migrate the unique index."));
+        }
     }
 
     private void fixAcceptedDao(ConnectionSource connPool) throws SQLException {
         LOGGER.info("Migration: {}", Migrations.FIX_ACCEPTED_DAO);
         TableUtils.dropTable(acceptedDao, true);
         TableUtils.createTableIfNotExists(connPool, AcceptedDao.class);
+    }
+
+    private void fixHashDaoUniqueIndex(ConnectionSource connPool) throws SQLException {
+        LOGGER.info("Migration: {}", Migrations.FIX_HASH_DAO_UNIQUE_INDEX);
+        TableUtils.dropTable(hashDao, true);
+        TableUtils.createTableIfNotExists(connPool, HashDao.class);
     }
 
     private <V, K> Dao<V, K> createDaoAndTable(ConnectionSource connPool, Class<V> c) throws SQLException {

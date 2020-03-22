@@ -6,13 +6,16 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "hashes")
 public class HashDao {
 
-    @DatabaseField(canBeNull = false, id = true)
+    @DatabaseField(generatedId = true)
+    private Long id;
+
+    @DatabaseField(canBeNull = false, uniqueCombo = true)
     private String mxid;
 
-    @DatabaseField(canBeNull = false)
+    @DatabaseField(canBeNull = false, uniqueCombo = true)
     private String medium;
 
-    @DatabaseField(canBeNull = false)
+    @DatabaseField(canBeNull = false, uniqueCombo = true)
     private String address;
 
     @DatabaseField(canBeNull = false)
@@ -26,6 +29,14 @@ public class HashDao {
         this.medium = medium;
         this.address = address;
         this.hash = hash;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getMxid() {
