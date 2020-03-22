@@ -136,7 +136,7 @@ sql:
 
 ```
 For the `role` query, `type` can be used to tell ma1sd how to inject the User ID in the query:
-- `localpart` will extract and set only the localpart.
+- `uid` will extract and set only the localpart.
 - `mxid` will use the ID as-is.
 
 On each query, the first parameter `?` is set as a string with the corresponding ID format.
