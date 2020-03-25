@@ -23,6 +23,7 @@ package io.kamax.mxisd;
 import io.kamax.mxisd.config.MatrixConfig;
 import io.kamax.mxisd.config.MxisdConfig;
 import io.kamax.mxisd.config.PolicyConfig;
+import io.kamax.mxisd.config.ServerConfig;
 import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.kamax.mxisd.http.undertow.handler.AuthorizationHandler;
 import io.kamax.mxisd.http.undertow.handler.CheckTermsHandler;
@@ -145,7 +146,8 @@ public class HttpMxisd {
         termsEndpoints(handler);
         hashEndpoints(handler);
         accountEndpoints(handler);
-        httpSrv = Undertow.builder().addHttpListener(m.getConfig().getServer().getPort(), "0.0.0.0").setHandler(handler).build();
+        ServerConfig serverConfig = m.getConfig().getServer();
+        httpSrv = Undertow.builder().addHttpListener(serverConfig.getPort(), serverConfig.getHostname()).setHandler(handler).build();
 
         httpSrv.start();
     }

@@ -34,6 +34,7 @@ public class ServerConfig {
     private String name;
     private int port = 8090;
     private String publicUrl;
+    private String hostname;
 
     public String getName() {
         return name;
@@ -59,6 +60,14 @@ public class ServerConfig {
         this.publicUrl = publicUrl;
     }
 
+    public String getHostname() {
+        return hostname;
+    }
+
+    public void setHostname(String hostname) {
+        this.hostname = hostname;
+    }
+
     public void build() {
         log.info("--- Server config ---");
 
@@ -75,8 +84,13 @@ public class ServerConfig {
             log.warn("Public URL is not valid: {}", StringUtils.defaultIfBlank(e.getMessage(), "<no reason provided>"));
         }
 
+        if (StringUtils.isBlank(getHostname())) {
+            setHostname("0.0.0.0");
+        }
+
         log.info("Name: {}", getName());
         log.info("Port: {}", getPort());
         log.info("Public URL: {}", getPublicUrl());
+        log.info("Hostname: {}", getHostname());
     }
 }
