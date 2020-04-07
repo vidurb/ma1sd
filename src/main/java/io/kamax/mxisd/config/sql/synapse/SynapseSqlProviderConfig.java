@@ -56,7 +56,7 @@ public class SynapseSqlProviderConfig extends SqlConfig {
 
         if (getIdentity().isEnabled() && StringUtils.isBlank(getIdentity().getType())) {
             getIdentity().setType("mxid");
-            getIdentity().setQuery("SELECT user_id AS uid FROM user_threepids WHERE medium = ? AND address = ?");
+            getIdentity().setQuery("SELECT user_id AS uid FROM user_threepid_id_server WHERE medium = ? AND address = ?");
         }
 
         if (getProfile().isEnabled()) {

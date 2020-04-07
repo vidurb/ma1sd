@@ -125,7 +125,7 @@ public abstract class SqlConfig {
     }
 
     public static class Lookup {
-        private String query = "SELECT user_id AS mxid, medium, address from user_threepids";
+        private String query = "SELECT user_id AS mxid, medium, address from user_threepid_id_server";
 
         public String getQuery() {
             return query;
@@ -140,7 +140,7 @@ public abstract class SqlConfig {
 
         private Boolean enabled;
         private String type = "mxid";
-        private String query = "SELECT user_id AS uid FROM user_threepids WHERE medium = ? AND address = ?";
+        private String query = "SELECT user_id AS uid FROM user_threepid_id_server WHERE medium = ? AND address = ?";
         private Map<String, String> medium = new HashMap<>();
 
         public Boolean isEnabled() {
