@@ -22,7 +22,7 @@
 matrix:
   domain: ''
   v1: true   # deprecated
-  v2: false  # MSC2140 API v2. Disabled by default in order to preserve backward compatibility.
+  v2: true   # MSC2140 API v2. Riot require enabled V2 API.
 
 
 ################
