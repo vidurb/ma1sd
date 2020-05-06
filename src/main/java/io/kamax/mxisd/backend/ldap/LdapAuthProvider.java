@@ -162,6 +162,7 @@ public class LdapAuthProvider extends LdapBackend implements AuthenticatorProvid
             log.info("No match were found for {}", mxid);
             return BackendAuthResult.failure();
         } catch (LdapException | IOException | CursorException e) {
+            log.error("Unable to invoke query request: ", e);
             throw new InternalServerError(e);
         }
     }
