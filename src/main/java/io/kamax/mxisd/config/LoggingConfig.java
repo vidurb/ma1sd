@@ -10,6 +10,7 @@ public class LoggingConfig {
 
     private String root;
     private String app;
+    private boolean requests = false;
 
     public String getRoot() {
         return root;
@@ -27,6 +28,14 @@ public class LoggingConfig {
         this.app = app;
     }
 
+    public boolean isRequests() {
+        return requests;
+    }
+
+    public void setRequests(boolean requests) {
+        this.requests = requests;
+    }
+
     public void build() {
         LOGGER.info("Logging config:");
         if (StringUtils.isNotBlank(getRoot())) {
@@ -42,6 +51,10 @@ public class LoggingConfig {
             LOGGER.info("  Logging level set by the configuration: {}", getApp());
         } else {
             LOGGER.info("  Logging level hasn't set, use default");
+        }
+        LOGGER.info("  Log requests: {}", isRequests());
+        if (isRequests()) {
+            LOGGER.warn("  Request dumping enabled, use this only to debug purposes, don't use it in the production.");
         }
     }
 }

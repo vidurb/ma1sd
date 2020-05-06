@@ -29,6 +29,7 @@ import io.kamax.mxisd.http.undertow.handler.AuthorizationHandler;
 import io.kamax.mxisd.http.undertow.handler.CheckTermsHandler;
 import io.kamax.mxisd.http.undertow.handler.InternalInfoHandler;
 import io.kamax.mxisd.http.undertow.handler.OptionsHandler;
+import io.kamax.mxisd.http.undertow.handler.RequestDumpingHandler;
 import io.kamax.mxisd.http.undertow.handler.SaneHandler;
 import io.kamax.mxisd.http.undertow.handler.as.v1.AsNotFoundHandler;
 import io.kamax.mxisd.http.undertow.handler.as.v1.AsTransactionHandler;
@@ -100,9 +101,9 @@ public class HttpMxisd {
     public void start() {
         m.start();
 
-        HttpHandler asUserHandler = SaneHandler.around(new AsUserHandler(m.getAs()));
-        HttpHandler asTxnHandler = SaneHandler.around(new AsTransactionHandler(m.getAs()));
-        HttpHandler asNotFoundHandler = SaneHandler.around(new AsNotFoundHandler(m.getAs()));
+        HttpHandler asUserHandler = sane(new AsUserHandler(m.getAs()));
+        HttpHandler asTxnHandler = sane(new AsTransactionHandler(m.getAs()));
+        HttpHandler asNotFoundHandler = sane(new AsNotFoundHandler(m.getAs()));
 
         final RoutingHandler handler = Handlers.routing()
             .add("OPTIONS", "/**", sane(new OptionsHandler()))
@@ -267,6 +268,11 @@ public class HttpMxisd {
     }
 
     private HttpHandler sane(HttpHandler httpHandler) {
-        return SaneHandler.around(httpHandler);
+        SaneHandler handler = SaneHandler.around(httpHandler);
+        if (m.getConfig().getLogging().isRequests()) {
+            return new RequestDumpingHandler(handler);
+        } else {
+            return handler;
+        }
     }
 }

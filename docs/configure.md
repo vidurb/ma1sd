@@ -82,8 +82,9 @@ See [the migration instruction](migration-to-postgresql.md) from sqlite to postg
 ## Logging
 ```yaml
 logging:
-  root: error  # default level for all loggers (apps and thirdparty libraries)
-  app: info    # log level only for the ma1sd
+  root: error     # default level for all loggers (apps and thirdparty libraries)
+  app: info       # log level only for the ma1sd
+  requests: false # log request and response
 ```
 
 Possible value: `trace`, `debug`, `info`, `warn`, `error`, `off`.
@@ -99,6 +100,11 @@ Default value for app level: `info`.
 |  | app: info |
 | -v | app: debug |
 | -vv | app: trace |
+
+#### WARNING
+
+The setting `logging.requests` *MUST NOT* be used in production due it prints full unmasked request and response into the log and can be cause of the data leak. 
+This setting can be used only to testing and debugging errors.
 
 ## Identity stores
 See the [Identity stores](stores/README.md) for specific configuration
