@@ -23,6 +23,9 @@ package io.kamax.mxisd.storage.ormlite;
 import com.j256.ormlite.dao.CloseableWrappedIterable;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.db.DatabaseType;
+import com.j256.ormlite.db.PostgresDatabaseType;
+import com.j256.ormlite.db.SqliteDatabaseType;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
@@ -82,6 +85,7 @@ public class OrmLiteSqlStorage implements IStorage {
     public static class Migrations {
         public static final String FIX_ACCEPTED_DAO = "2019_12_09__2254__fix_accepted_dao";
         public static final String FIX_HASH_DAO_UNIQUE_INDEX = "2020_03_22__1153__fix_hash_dao_unique_index";
+        public static final String CHANGE_TYPE_TO_TEXT_INVITE = "2020_04_21__2338__change_type_table_invites";
     }
 
     private Dao<ThreePidInviteIO, String> invDao;
@@ -109,7 +113,19 @@ public class OrmLiteSqlStorage implements IStorage {
         }
 
         withCatcher(() -> {
-            ConnectionSource connPool = new JdbcConnectionSource("jdbc:" + backend + ":" + database, username, password);
+            DatabaseType databaseType;
+            switch (backend) {
+                case postgresql:
+                    databaseType = new PostgresDatabaseType();
+                    break;
+                case sqlite:
+                    databaseType = new SqliteDatabaseType();
+                    break;
+                default:
+                    throw new ConfigurationException("storage.backend");
+            }
+
+            ConnectionSource connPool = new JdbcConnectionSource("jdbc:" + backend + ":" + database, username, password, databaseType);
             changelogDao = createDaoAndTable(connPool, ChangelogDao.class);
             invDao = createDaoAndTable(connPool, ThreePidInviteIO.class);
             expInvDao = createDaoAndTable(connPool, HistoricalThreePidInviteIO.class);
@@ -134,6 +150,11 @@ public class OrmLiteSqlStorage implements IStorage {
             changelogDao
                 .create(new ChangelogDao(Migrations.FIX_HASH_DAO_UNIQUE_INDEX, new Date(), "Add the id and migrate the unique index."));
         }
+        ChangelogDao fixInviteTableColumnType = changelogDao.queryForId(Migrations.CHANGE_TYPE_TO_TEXT_INVITE);
+        if (fixInviteTableColumnType == null) {
+            fixInviteTableColumnType(connPol);
+            changelogDao.create(new ChangelogDao(Migrations.CHANGE_TYPE_TO_TEXT_INVITE, new Date(), "Modify column type to text."));
+        }
     }
 
     private void fixAcceptedDao(ConnectionSource connPool) throws SQLException {
@@ -146,6 +167,19 @@ public class OrmLiteSqlStorage implements IStorage {
         LOGGER.info("Migration: {}", Migrations.FIX_HASH_DAO_UNIQUE_INDEX);
         TableUtils.dropTable(hashDao, true);
         TableUtils.createTableIfNotExists(connPool, HashDao.class);
+    }
+
+    private void fixInviteTableColumnType(ConnectionSource connPool) throws SQLException {
+        LOGGER.info("Migration: {}", Migrations.CHANGE_TYPE_TO_TEXT_INVITE);
+        if (StorageConfig.BackendEnum.postgresql == backend) {
+            invDao.executeRawNoArgs("alter table invite_3pid alter column \"roomId\" type text");
+            invDao.executeRawNoArgs("alter table invite_3pid alter column id type text");
+            invDao.executeRawNoArgs("alter table invite_3pid alter column token type text");
+            invDao.executeRawNoArgs("alter table invite_3pid alter column sender type text");
+            invDao.executeRawNoArgs("alter table invite_3pid alter column medium type text");
+            invDao.executeRawNoArgs("alter table invite_3pid alter column address type text");
+            invDao.executeRawNoArgs("alter table invite_3pid alter column properties type text");
+        }
     }
 
     private <V, K> Dao<V, K> createDaoAndTable(ConnectionSource connPool, Class<V> c) throws SQLException {
