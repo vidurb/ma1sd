@@ -23,15 +23,17 @@ package io.kamax.mxisd.storage.ormlite;
 import com.j256.ormlite.dao.CloseableWrappedIterable;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.db.DatabaseType;
 import com.j256.ormlite.db.PostgresDatabaseType;
 import com.j256.ormlite.db.SqliteDatabaseType;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
+import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import io.kamax.matrix.ThreePid;
 import io.kamax.mxisd.config.PolicyConfig;
+import io.kamax.mxisd.config.PostgresqlStorageConfig;
+import io.kamax.mxisd.config.SQLiteStorageConfig;
 import io.kamax.mxisd.config.StorageConfig;
 import io.kamax.mxisd.exception.ConfigurationException;
 import io.kamax.mxisd.exception.InternalServerError;
@@ -98,34 +100,25 @@ public class OrmLiteSqlStorage implements IStorage {
     private Dao<ChangelogDao, String> changelogDao;
     private StorageConfig.BackendEnum backend;
 
-    public OrmLiteSqlStorage(StorageConfig.BackendEnum backend, String path) {
-        this(backend, path, null, null);
-    }
-
-    public OrmLiteSqlStorage(StorageConfig.BackendEnum backend, String database, String username, String password) {
+    public OrmLiteSqlStorage(StorageConfig.BackendEnum backend, StorageConfig.Provider provider) {
         if (backend == null) {
             throw new ConfigurationException("storage.backend");
         }
         this.backend = backend;
 
-        if (StringUtils.isBlank(database)) {
-            throw new ConfigurationException("Storage destination cannot be empty");
-        }
-
         withCatcher(() -> {
-            DatabaseType databaseType;
+            ConnectionSource connPool;
             switch (backend) {
                 case postgresql:
-                    databaseType = new PostgresDatabaseType();
+                    connPool = createPostgresqlConnection(provider.getPostgresql());
                     break;
                 case sqlite:
-                    databaseType = new SqliteDatabaseType();
+                    connPool = createSqliteConnection(provider.getSqlite());
                     break;
                 default:
                     throw new ConfigurationException("storage.backend");
             }
 
-            ConnectionSource connPool = new JdbcConnectionSource("jdbc:" + backend + ":" + database, username, password, databaseType);
             changelogDao = createDaoAndTable(connPool, ChangelogDao.class);
             invDao = createDaoAndTable(connPool, ThreePidInviteIO.class);
             expInvDao = createDaoAndTable(connPool, HistoricalThreePidInviteIO.class);
@@ -133,9 +126,38 @@ public class OrmLiteSqlStorage implements IStorage {
             asTxnDao = createDaoAndTable(connPool, ASTransactionDao.class);
             accountDao = createDaoAndTable(connPool, AccountDao.class);
             acceptedDao = createDaoAndTable(connPool, AcceptedDao.class, true);
-            hashDao = createDaoAndTable(connPool, HashDao.class);
+            hashDao = createDaoAndTable(connPool, HashDao.class, true);
             runMigration(connPool);
         });
+    }
+
+    private ConnectionSource createSqliteConnection(SQLiteStorageConfig config) throws SQLException {
+        if (StringUtils.isBlank(config.getDatabase())) {
+            throw new ConfigurationException("Storage destination cannot be empty");
+        }
+
+        return new JdbcConnectionSource("jdbc:" + backend + ":" + config.getDatabase(), null, null, new SqliteDatabaseType());
+    }
+
+    private ConnectionSource createPostgresqlConnection(PostgresqlStorageConfig config) throws SQLException {
+        if (StringUtils.isBlank(config.getDatabase())) {
+            throw new ConfigurationException("Storage destination cannot be empty");
+        }
+
+        if (config.isPool()) {
+            LOGGER.info("Enable pooling");
+            JdbcPooledConnectionSource source = new JdbcPooledConnectionSource(
+                "jdbc:" + backend + ":" + config.getDatabase(), config.getUsername(), config.getPassword(),
+                new PostgresDatabaseType());
+            source.setMaxConnectionsFree(config.getMaxConnectionsFree());
+            source.setMaxConnectionAgeMillis(config.getMaxConnectionAgeMillis());
+            source.setCheckConnectionsEveryMillis(config.getCheckConnectionsEveryMillis());
+            source.setTestBeforeGet(config.isTestBeforeGetFromPool());
+            return source;
+        } else {
+            return new JdbcConnectionSource("jdbc:" + backend + ":" + config.getDatabase(), config.getUsername(), config.getPassword(),
+                new PostgresDatabaseType());
+        }
     }
 
     private void runMigration(ConnectionSource connPol) throws SQLException {

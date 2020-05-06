@@ -27,7 +27,6 @@ import io.kamax.mxisd.auth.AuthProviders;
 import io.kamax.mxisd.backend.IdentityStoreSupplier;
 import io.kamax.mxisd.backend.sql.synapse.Synapse;
 import io.kamax.mxisd.config.MxisdConfig;
-import io.kamax.mxisd.config.PostgresqlStorageConfig;
 import io.kamax.mxisd.config.StorageConfig;
 import io.kamax.mxisd.crypto.CryptoFactory;
 import io.kamax.mxisd.crypto.KeyManager;
@@ -68,7 +67,7 @@ public class Mxisd {
     public static final String Version = StringUtils.defaultIfBlank(Mxisd.class.getPackage().getImplementationVersion(), "UNKNOWN");
     public static final String Agent = Name + "/" + Version;
 
-    private MxisdConfig cfg;
+    private final MxisdConfig cfg;
 
     private CloseableHttpClient httpClient;
     private IRemoteIdentityServerFetcher srvFetcher;
@@ -113,17 +112,7 @@ public class Mxisd {
 
         StorageConfig.BackendEnum storageBackend = cfg.getStorage().getBackend();
         StorageConfig.Provider storageProvider = cfg.getStorage().getProvider();
-        switch (storageBackend) {
-            case sqlite:
-                store = new OrmLiteSqlStorage(storageBackend, storageProvider.getSqlite().getDatabase());
-                break;
-            case postgresql:
-                PostgresqlStorageConfig postgresql = storageProvider.getPostgresql();
-                store = new OrmLiteSqlStorage(storageBackend, postgresql.getDatabase(), postgresql.getUsername(), postgresql.getPassword());
-                break;
-            default:
-                throw new IllegalStateException("Storage provider hasn't been configured");
-        }
+        store = new OrmLiteSqlStorage(storageBackend, storageProvider);
 
         keyMgr = CryptoFactory.getKeyManager(cfg.getKey());
         signMgr = CryptoFactory.getSignatureManager(cfg, keyMgr);

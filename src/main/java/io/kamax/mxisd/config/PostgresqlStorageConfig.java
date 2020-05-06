@@ -20,7 +20,7 @@
 
 package io.kamax.mxisd.config;
 
-public class PostgresqlStorageConfig {
+public class PostgresqlStorageConfig implements DatabaseStorageConfig {
 
     private String database;
 
@@ -28,6 +28,17 @@ public class PostgresqlStorageConfig {
 
     private String password;
 
+    private boolean pool;
+
+    private int maxConnectionsFree = 1;
+
+    private long maxConnectionAgeMillis = 60 * 60 * 1000;
+
+    private long checkConnectionsEveryMillis = 30 * 1000;
+
+    private boolean testBeforeGetFromPool = false;
+
+    @Override
     public String getDatabase() {
         return database;
     }
@@ -50,5 +61,45 @@ public class PostgresqlStorageConfig {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isPool() {
+        return pool;
+    }
+
+    public void setPool(boolean pool) {
+        this.pool = pool;
+    }
+
+    public int getMaxConnectionsFree() {
+        return maxConnectionsFree;
+    }
+
+    public void setMaxConnectionsFree(int maxConnectionsFree) {
+        this.maxConnectionsFree = maxConnectionsFree;
+    }
+
+    public long getMaxConnectionAgeMillis() {
+        return maxConnectionAgeMillis;
+    }
+
+    public void setMaxConnectionAgeMillis(long maxConnectionAgeMillis) {
+        this.maxConnectionAgeMillis = maxConnectionAgeMillis;
+    }
+
+    public long getCheckConnectionsEveryMillis() {
+        return checkConnectionsEveryMillis;
+    }
+
+    public void setCheckConnectionsEveryMillis(long checkConnectionsEveryMillis) {
+        this.checkConnectionsEveryMillis = checkConnectionsEveryMillis;
+    }
+
+    public boolean isTestBeforeGetFromPool() {
+        return testBeforeGetFromPool;
+    }
+
+    public void setTestBeforeGetFromPool(boolean testBeforeGetFromPool) {
+        this.testBeforeGetFromPool = testBeforeGetFromPool;
     }
 }

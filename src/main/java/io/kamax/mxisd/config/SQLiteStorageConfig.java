@@ -20,10 +20,11 @@
 
 package io.kamax.mxisd.config;
 
-public class SQLiteStorageConfig {
+public class SQLiteStorageConfig implements DatabaseStorageConfig {
 
     private String database;
 
+    @Override
     public String getDatabase() {
         return database;
     }

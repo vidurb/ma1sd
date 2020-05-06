@@ -51,10 +51,39 @@ key:
 #  - /var/lib/ma1sd/store.db
 #
 storage:
+# backend: sqlite # or postgresql
   provider:
     sqlite:
       database: '/path/to/ma1sd.db'
-
+#    postgresql:
+#      # Wrap all string values with quotes to avoid yaml parsing mistakes
+#      database: '//localhost/ma1sd' # or full variant //192.168.1.100:5432/ma1sd_database
+#      username: 'ma1sd_user'
+#      password: 'ma1sd_password'
+#
+#      # Pool configuration for postgresql backend.
+#      #######
+#      # Enable or disable pooling
+#      pool: false
+#
+#      #######
+#      # Check database connection before get from pool
+#      testBeforeGetFromPool: false # or true
+#
+#      #######
+#      # There is an internal thread which checks each of the database connections as a keep-alive mechanism. This set the
+#      # number of milliseconds it sleeps between checks -- default is 30000. To disable the checking thread, set this to
+#      # 0 before you start using the connection source.
+#      checkConnectionsEveryMillis: 30000
+#
+#      #######
+#      # Set the number of connections that can be unused in the available list.
+#      maxConnectionsFree: 5
+#
+#      #######
+#      # Set the number of milliseconds that a connection can stay open before being closed. Set to 9223372036854775807 to have
+#      # the connections never expire.
+#      maxConnectionAgeMillis: 3600000
 
 ###################
 # Identity Stores #
