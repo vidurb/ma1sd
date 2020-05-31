@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class HashingConfig {
 
@@ -13,7 +14,7 @@ public class HashingConfig {
     private boolean enabled = false;
     private int pepperLength = 20;
     private RotationPolicyEnum rotationPolicy;
-    private HashStorageEnum hashStorageType;
+    private HashStorageEnum hashStorageType = HashStorageEnum.in_memory;
     private String delay = "10s";
     private transient long delayInSeconds = 10;
     private int requests = 10;
@@ -25,6 +26,7 @@ public class HashingConfig {
             LOGGER.info("   Pepper length: {}", getPepperLength());
             LOGGER.info("   Rotation policy: {}", getRotationPolicy());
             LOGGER.info("   Hash storage type: {}", getHashStorageType());
+            Objects.requireNonNull(getHashStorageType(), "Storage type must be specified");
             if (RotationPolicyEnum.per_seconds == getRotationPolicy()) {
                 setDelayInSeconds(new DurationDeserializer().deserialize(getDelay()));
                 LOGGER.info("   Rotation delay: {}", getDelay());
