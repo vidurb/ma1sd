@@ -274,12 +274,45 @@ task dockerBuild(type: Exec, dependsOn: shadowJar) {
     }
 }
 
+task dockerBuildX(type: Exec, dependsOn: shadowJar) {
+    commandLine 'docker', 'buildx', 'build', '--load', '--platform', 'linux/arm64', '-t', dockerImageTag + '-arm64', project.rootDir
+    doLast {
+        exec {
+            commandLine 'docker', 'buildx', 'build', '--load', '--platform', 'linux/amd64', '-t', dockerImageTag + '-amd64', project.rootDir
+        }
+
+        exec {
+            commandLine 'docker', 'tag', dockerImageTag + '-arm64', "${dockerImageName}:latest-arm64-dev"
+        }
+
+        exec {
+            commandLine 'docker', 'tag', dockerImageTag + '-amd64', "${dockerImageName}:latest-amd64-dev"
+        }
+
+        exec {
+            commandLine 'docker', 'tag', dockerImageTag + '-amd64', "${dockerImageName}:latest-dev"
+        }
+    }
+}
+
 task dockerPush(type: Exec) {
     commandLine 'docker', 'push', dockerImageTag
 
     doLast {
         exec {
             commandLine 'docker', 'push', "${dockerImageName}:latest-dev"
+        }
+    }
+}
+
+task dockerPushX(type: Exec) {
+    commandLine 'docker', 'push', dockerImageTag
+
+    doLast {
+        exec {
+            commandLine 'docker', 'push', "${dockerImageName}:latest-dev"
+            commandLine 'docker', 'push', "${dockerImageName}:latest-amd64-dev"
+            commandLine 'docker', 'push', "${dockerImageName}:latest-arm64-dev"
         }
     }
 }

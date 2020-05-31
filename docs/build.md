@@ -9,6 +9,8 @@
 ## Binaries
 ### Requirements
 - JDK 1.8
+- OpenJDK 11
+- OpenJDK 14
 
 ### Build
 ```bash
@@ -69,6 +71,14 @@ Then follow the instruction in the [Debian package](install/debian.md) document.
 ./gradlew dockerBuild
 ```
 Then follow the instructions in the [Docker install](install/docker.md#configure) document.
+
+### Multi-platform builds
+
+Provided with experimental docker feature [buildx](https://docs.docker.com/buildx/working-with-buildx/)
+To build the arm64 and amd64 images run:
+```bash
+./gradlew dockerBuildX
+```
 
 ## Next steps
 - [Integrate with your infrastructure](getting-started.md#integrate)
