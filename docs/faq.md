@@ -56,8 +56,7 @@ Accounts cannot currently migrate/move from one server to another.
 See a [brief explanation document](concepts.md) about Matrix and ma1sd concepts and vocabulary.
 
 ### I already use the synapse LDAP3 auth provider. Why should I care about ma1sd?
-The [synapse LDAP3 auth provider](https://github.com/matrix-org/matrix-synapse-ldap3) is not longer maintained despite
-saying so and only handles on specific flow: validate credentials at login.
+The [synapse LDAP3 auth provider](https://github.com/matrix-org/matrix-synapse-ldap3) only handles on specific flow: validate credentials at login.
 
 It does not:
 - Auto-provision user profiles
