@@ -130,7 +130,9 @@ public class HomeserverFederationResolver {
 
             return Optional.empty();
         } catch (IOException e) {
-            throw new RuntimeException("Error while trying to lookup well-known for " + domain, e);
+            log.info("Error while trying to lookup well-known for " + domain);
+            log.trace("Error while trying to lookup well-known for " + domain, e);
+            return Optional.empty();
         }
     }
 
