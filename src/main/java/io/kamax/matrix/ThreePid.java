@@ -27,7 +27,7 @@ public class ThreePid implements _ThreePid {
 
     public ThreePid(String medium, String address) {
         this.medium = medium;
-        this.address = address;
+        this.address = address.toLowerCase();
     }
 
     @Override
