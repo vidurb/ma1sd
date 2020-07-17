@@ -264,7 +264,7 @@ task debBuild(dependsOn: shadowJar) {
     }
 }
 
-task dockerBuild(type: Exec, dependsOn: shadowJar) {
+task dockerBuild(type: Exec) {
     commandLine 'docker', 'build', '-t', dockerImageTag, project.rootDir
 
     doLast {
