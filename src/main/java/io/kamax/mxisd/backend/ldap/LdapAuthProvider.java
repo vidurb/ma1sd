@@ -54,6 +54,8 @@ public class LdapAuthProvider extends LdapBackend implements AuthenticatorProvid
 
     private transient final Logger log = LoggerFactory.getLogger(LdapAuthProvider.class);
 
+    public static final char[] CHARACTERS_TO_ESCAPE = ",#+<>;\"=*\\\\".toCharArray();
+
     private PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
 
     public LdapAuthProvider(LdapConfig cfg, MatrixConfig mxCfg) {
@@ -94,7 +96,8 @@ public class LdapAuthProvider extends LdapBackend implements AuthenticatorProvid
                 return BackendAuthResult.failure();
             }
 
-            String userFilter = "(" + getUidAtt() + "=" + userFilterValue + ")";
+            String filteredValue = escape(userFilterValue);
+            String userFilter = "(" + getUidAtt() + "=" + filteredValue + ")";
             userFilter = buildWithFilter(userFilter, getCfg().getAuth().getFilter());
 
             Set<String> attributes = new HashSet<>();
@@ -167,4 +170,16 @@ public class LdapAuthProvider extends LdapBackend implements AuthenticatorProvid
         }
     }
 
+    private String escape(String raw) {
+        StringBuilder sb = new StringBuilder();
+        boolean escape;
+        for (char c : raw.toCharArray()) {
+            escape = false;
+            for (int i = 0; i < CHARACTERS_TO_ESCAPE.length && !escape; i++) {
+                escape = CHARACTERS_TO_ESCAPE[i] == c;
+            }
+            sb.append(escape ? "\\" + c : c);
+        }
+        return sb.toString();
+    }
 }
