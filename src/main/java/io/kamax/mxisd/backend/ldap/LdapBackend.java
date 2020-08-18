@@ -20,6 +20,7 @@
 
 package io.kamax.mxisd.backend.ldap;
 
+import io.kamax.matrix.MatrixID;
 import io.kamax.matrix._MatrixID;
 import io.kamax.mxisd.config.MatrixConfig;
 import io.kamax.mxisd.config.ldap.LdapConfig;
@@ -116,10 +117,16 @@ public abstract class LdapBackend {
 
     public String buildMatrixIdFromUid(String uid) {
         String uidType = getCfg().getAttribute().getUid().getType();
+        String localpart = uid;
+
         if (StringUtils.equals(UID, uidType)) {
-            return "@" + uid + ":" + mxCfg.getDomain();
+            if(getCfg().isActiveDirectory()) {
+                localpart  = new UPN(uid).getMXID();
+            }
+
+            return "@" + localpart + ":" + mxCfg.getDomain();
         } else if (StringUtils.equals(MATRIX_ID, uidType)) {
-            return uid;
+            return localpart;
         } else {
             throw new IllegalArgumentException("Bind type " + uidType + " is not supported");
         }
@@ -128,6 +135,10 @@ public abstract class LdapBackend {
     public String buildUidFromMatrixId(_MatrixID mxId) {
         String uidType = getCfg().getAttribute().getUid().getType();
         if (StringUtils.equals(UID, uidType)) {
+            if(getCfg().isActiveDirectory()) {
+                return new UPN(mxId).getUPN();
+            }
+
             return mxId.getLocalPart();
         } else if (StringUtils.equals(MATRIX_ID, uidType)) {
             return mxId.getId();
@@ -169,4 +180,58 @@ public abstract class LdapBackend {
         return values;
     }
 
+    private class UPN {
+        private String login;
+        private String domain;
+
+        public UPN(String userPrincipalName) {
+            String[] uidParts = userPrincipalName.split("@");
+
+            if (uidParts.length != 2) {
+                throw new IllegalArgumentException(String.format("Wrong userPrincipalName provided: %s", userPrincipalName));
+            }
+
+            this.login = uidParts[0];
+            this.domain = uidParts[1];
+        }
+
+        public UPN(_MatrixID mxid) {
+            String[] idParts = mxid.getLocalPart().split("/");
+
+            if (idParts.length != 2) {
+                if(idParts.length == 1 && !StringUtils.isEmpty(getCfg().getDefaultDomain())) {
+                    throw new IllegalArgumentException(String.format(
+                        "Local part of mxid %s does not contains domain separator and default domain is not configured",
+                        mxid.getLocalPart()
+                    ));
+                }
+
+                this.domain = getCfg().getDefaultDomain();
+            } else {
+                this.domain = idParts[1];
+            }
+
+            this.login = idParts[0];
+        }
+
+        public String getLogin() {
+            return login;
+        }
+
+        public String getDomain() {
+            return domain;
+        }
+
+        public String getMXID() {
+            if(StringUtils.equalsIgnoreCase(getCfg().getDefaultDomain(), this.domain)) {
+                return this.login;
+            }
+
+            return new StringBuilder(this.login).append("/").append(this.domain).toString();
+        }
+
+        public String getUPN() {
+            return new StringBuilder(this.login).append("@").append(this.domain).toString();
+        }
+    }
 }
