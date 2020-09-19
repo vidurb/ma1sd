@@ -264,7 +264,7 @@ task debBuild(dependsOn: shadowJar) {
     }
 }
 
-task dockerBuild(type: Exec, dependsOn: shadowJar) {
+task dockerBuild(type: Exec) {
     commandLine 'docker', 'build', '-t', dockerImageTag, project.rootDir
 
     doLast {
@@ -275,22 +275,10 @@ task dockerBuild(type: Exec, dependsOn: shadowJar) {
 }
 
 task dockerBuildX(type: Exec, dependsOn: shadowJar) {
-    commandLine 'docker', 'buildx', 'build', '--load', '--platform', 'linux/arm64', '-t', dockerImageTag + '-arm64', project.rootDir
+    commandLine 'docker', 'buildx', 'build', '--push', '--platform', 'linux/arm64,linux/amd64,linux/arm/v7', '-t', dockerImageTag , project.rootDir
     doLast {
         exec {
-            commandLine 'docker', 'buildx', 'build', '--load', '--platform', 'linux/amd64', '-t', dockerImageTag + '-amd64', project.rootDir
-        }
-
-        exec {
-            commandLine 'docker', 'tag', dockerImageTag + '-arm64', "${dockerImageName}:latest-arm64-dev"
-        }
-
-        exec {
-            commandLine 'docker', 'tag', dockerImageTag + '-amd64', "${dockerImageName}:latest-amd64-dev"
-        }
-
-        exec {
-            commandLine 'docker', 'tag', dockerImageTag + '-amd64', "${dockerImageName}:latest-dev"
+            commandLine 'docker', 'buildx', 'build', '--push', '--platform', 'linux/arm64,linux/amd64,linux/arm/v7', '-t', "${dockerImageName}:latest-dev", project.rootDir
         }
     }
 }
