@@ -165,6 +165,8 @@ threepid:
 # ldap:
 #   enabled: true
 #   lookup: true # hash lookup
+#   activeDirectory: false
+#   defaultDomain: ''
 #   connection:
 #     host: 'ldap.domain.tld'
 #     port: 389

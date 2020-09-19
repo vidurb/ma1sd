@@ -291,6 +291,9 @@ public abstract class LdapConfig {
     private boolean enabled;
     private String filter;
 
+    private boolean activeDirectory;
+    private String defaultDomain;
+
     private Connection connection = new Connection();
     private Attribute attribute = new Attribute();
     private Auth auth = new Auth();
@@ -314,6 +317,22 @@ public abstract class LdapConfig {
 
     public void setFilter(String filter) {
         this.filter = filter;
+    }
+
+    public boolean isActiveDirectory() {
+        return activeDirectory;
+    }
+
+    public void setActiveDirectory(boolean activeDirectory) {
+        this.activeDirectory = activeDirectory;
+    }
+
+    public String getDefaultDomain() {
+        return defaultDomain;
+    }
+
+    public void setDefaultDomain(String defaultDomain) {
+        this.defaultDomain = defaultDomain;
     }
 
     public Connection getConnection() {
@@ -405,6 +424,15 @@ public abstract class LdapConfig {
 
         if (StringUtils.isBlank(identity.getToken())) {
             throw new ConfigurationException("ldap.identity.token");
+        }
+
+        if(isActiveDirectory()) {
+            if(!StringUtils.equals(LdapBackend.UID, uidType)) {
+                throw new IllegalArgumentException(String.format(
+                    "Attribute UID type should be set to %s in Active Directory mode",
+                    LdapBackend.UID
+                ));
+            }
         }
 
         // Build queries
