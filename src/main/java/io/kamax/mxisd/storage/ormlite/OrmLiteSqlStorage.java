@@ -88,6 +88,7 @@ public class OrmLiteSqlStorage implements IStorage {
         public static final String FIX_ACCEPTED_DAO = "2019_12_09__2254__fix_accepted_dao";
         public static final String FIX_HASH_DAO_UNIQUE_INDEX = "2020_03_22__1153__fix_hash_dao_unique_index";
         public static final String CHANGE_TYPE_TO_TEXT_INVITE = "2020_04_21__2338__change_type_table_invites";
+        public static final String CHANGE_TYPE_TO_TEXT_INVITE_HISTORY = "2020_10_26__2200__change_type_table_invite_history";
     }
 
     private Dao<ThreePidInviteIO, String> invDao;
@@ -177,6 +178,11 @@ public class OrmLiteSqlStorage implements IStorage {
             fixInviteTableColumnType(connPol);
             changelogDao.create(new ChangelogDao(Migrations.CHANGE_TYPE_TO_TEXT_INVITE, new Date(), "Modify column type to text."));
         }
+        ChangelogDao fixInviteHistoryTableColumnType = changelogDao.queryForId(Migrations.CHANGE_TYPE_TO_TEXT_INVITE_HISTORY);
+        if (fixInviteHistoryTableColumnType == null) {
+            fixInviteHistoryTableColumnType(connPol);
+            changelogDao.create(new ChangelogDao(Migrations.CHANGE_TYPE_TO_TEXT_INVITE_HISTORY, new Date(), "Modify column type to text."));
+        }
     }
 
     private void fixAcceptedDao(ConnectionSource connPool) throws SQLException {
@@ -201,6 +207,20 @@ public class OrmLiteSqlStorage implements IStorage {
             invDao.executeRawNoArgs("alter table invite_3pid alter column medium type text");
             invDao.executeRawNoArgs("alter table invite_3pid alter column address type text");
             invDao.executeRawNoArgs("alter table invite_3pid alter column properties type text");
+        }
+    }
+
+    private void fixInviteHistoryTableColumnType(ConnectionSource connPool) throws SQLException {
+        LOGGER.info("Migration: {}", Migrations.CHANGE_TYPE_TO_TEXT_INVITE_HISTORY);
+        if (StorageConfig.BackendEnum.postgresql == backend) {
+            invDao.executeRawNoArgs("alter table invite_3pid_history alter column \"resolvedTo\" type text");
+            invDao.executeRawNoArgs("alter table invite_3pid_history alter column id type text");
+            invDao.executeRawNoArgs("alter table invite_3pid_history alter column token type text");
+            invDao.executeRawNoArgs("alter table invite_3pid_history alter column sender type text");
+            invDao.executeRawNoArgs("alter table invite_3pid_history alter column medium type text");
+            invDao.executeRawNoArgs("alter table invite_3pid_history alter column address type text");
+            invDao.executeRawNoArgs("alter table invite_3pid_history alter column \"roomId\" type text");
+            invDao.executeRawNoArgs("alter table invite_3pid_history alter column properties type text");
         }
     }
 
