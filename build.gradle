@@ -137,6 +137,9 @@ dependencies {
 
     // MariaDB/MySQL
     compile 'org.mariadb.jdbc:mariadb-java-client:2.5.1'
+    
+    // UNIX sockets
+    compile 'com.kohlschutter.junixsocket:junixsocket-core:2.3.2'
 
     // Twilio SDK for SMS
     compile 'com.twilio.sdk:twilio:7.45.0'
