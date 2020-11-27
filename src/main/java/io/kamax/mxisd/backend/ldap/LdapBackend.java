@@ -117,11 +117,15 @@ public abstract class LdapBackend {
 
     public String buildMatrixIdFromUid(String uid) {
         String uidType = getCfg().getAttribute().getUid().getType();
-        String localpart = uid;
+        String localpart = uid.toLowerCase();
+
+        if (!StringUtils.equals(uid, localpart)) {
+            log.info("UID {} from LDAP has been changed to lowercase to match the Synapse specifications", uid);
+        }
 
         if (StringUtils.equals(UID, uidType)) {
             if(getCfg().isActiveDirectory()) {
-                localpart  = new UPN(uid).getMXID();
+                localpart  = new UPN(uid.toLowerCase()).getMXID();
             }
 
             return "@" + localpart + ":" + mxCfg.getDomain();
