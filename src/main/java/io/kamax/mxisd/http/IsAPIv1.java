@@ -20,11 +20,19 @@
 
 package io.kamax.mxisd.http;
 
+import static io.kamax.mxisd.util.RestClientUtils.urlEncode;
+
 public class IsAPIv1 {
 
     public static final String Base = "/_matrix/identity/api/v1";
 
     public static String getValidate(String medium, String sid, String secret, String token) {
-        return String.format("%s/validate/%s/submitToken?sid=%s&client_secret=%s&token=%s", Base, medium, sid, secret, token);
+        return String.format("%s/validate/%s/submitToken?sid=%s&client_secret=%s&token=%s",
+            Base,
+            medium,
+            urlEncode(sid),
+            urlEncode(secret),
+            urlEncode(token)
+        );
     }
 }
