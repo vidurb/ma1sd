@@ -121,15 +121,13 @@ server {
 }
 ```
 
-### Synapse
+### Synapse (Deprecated with synapse v1.4.0)
 Add your ma1sd domain into the `homeserver.yaml` at `trusted_third_party_id_servers` and restart synapse.  
 In a typical configuration, you would end up with something similar to:
 ```yaml
 trusted_third_party_id_servers:
     - matrix.example.org
 ```
-It is **highly recommended** to remove `matrix.org` and `vector.im` (or any other default entry) from your configuration
-so only your own Identity server is authoritative for your HS.
 
 ## Validate (Under reconstruction)
 **NOTE:** In case your homeserver has no working federation, step 5 will not happen. If step 4 took place, consider
