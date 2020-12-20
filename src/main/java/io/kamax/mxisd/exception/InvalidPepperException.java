@@ -23,5 +23,6 @@ package io.kamax.mxisd.exception;
 public class InvalidPepperException extends RuntimeException {
 
     public InvalidPepperException() {
+        super("The provided pepper is invalid or expired");
     }
 }

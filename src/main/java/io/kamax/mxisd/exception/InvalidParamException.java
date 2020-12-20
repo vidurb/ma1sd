@@ -23,5 +23,6 @@ package io.kamax.mxisd.exception;
 public class InvalidParamException extends RuntimeException {
 
     public InvalidParamException() {
+        super("The chosen hash algorithm is invalid or disallowed");
     }
 }

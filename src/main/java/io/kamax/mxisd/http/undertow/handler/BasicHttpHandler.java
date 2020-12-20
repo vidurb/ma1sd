@@ -189,7 +189,7 @@ public abstract class BasicHttpHandler implements HttpHandler {
     }
 
     protected void respond(HttpServerExchange ex, int status, String errCode, String error) {
-        respond(ex, status, buildErrorBody(ex, errCode, error));
+        respond(ex, status, buildErrorBody(ex, errCode, error != null ? error : "An error has occurred"));
     }
 
     protected void handleException(HttpServerExchange exchange, HttpMatrixException ex) {
