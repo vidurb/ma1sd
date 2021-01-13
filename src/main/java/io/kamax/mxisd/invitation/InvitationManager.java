@@ -99,14 +99,14 @@ public class InvitationManager {
     private Map<String, IThreePidInviteReply> invitations = new ConcurrentHashMap<>();
 
     public InvitationManager(
-            MxisdConfig mxisdCfg,
-            IStorage storage,
-            LookupStrategy lookupMgr,
-            KeyManager keyMgr,
-            SignatureManager signMgr,
-            HomeserverFederationResolver resolver,
-            NotificationManager notifMgr,
-            ProfileManager profileMgr
+        MxisdConfig mxisdCfg,
+        IStorage storage,
+        LookupStrategy lookupMgr,
+        KeyManager keyMgr,
+        SignatureManager signMgr,
+        HomeserverFederationResolver resolver,
+        NotificationManager notifMgr,
+        ProfileManager profileMgr
     ) {
         this.cfg = requireValid(mxisdCfg);
         this.srvCfg = mxisdCfg.getServer();
@@ -124,11 +124,11 @@ public class InvitationManager {
             io.getProperties().putIfAbsent(CreatedAtPropertyKey, defaultCreateTs);
             log.debug("Processing invite {}", GsonUtil.get().toJson(io));
             ThreePidInvite invite = new ThreePidInvite(
-                    MatrixID.asAcceptable(io.getSender()),
-                    io.getMedium(),
-                    io.getAddress(),
-                    io.getRoomId(),
-                    io.getProperties()
+                MatrixID.asAcceptable(io.getSender()),
+                io.getMedium(),
+                io.getAddress(),
+                io.getRoomId(),
+                io.getProperties()
             );
 
             ThreePidInviteReply reply = new ThreePidInviteReply(io.getId(), invite, io.getToken(), "", Collections.emptyList());
@@ -155,7 +155,17 @@ public class InvitationManager {
                     log.error("Error when running background maintenance", t);
                 }
             }
-        }, 5000L, TimeUnit.MILLISECONDS.convert(cfg.getResolution().getTimer(), TimeUnit.MINUTES));
+        }, 5000L, TimeUnit.MILLISECONDS.convert(cfg.getResolution().getTimer(), getTimeUnit()));
+    }
+
+    private TimeUnit getTimeUnit() {
+        switch (cfg.getResolution().getPeriod()) {
+            case seconds:
+                return TimeUnit.SECONDS;
+            case minutes:
+            default:
+                return TimeUnit.MINUTES;
+        }
     }
 
     private InvitationConfig requireValid(MxisdConfig cfg) {
@@ -176,7 +186,8 @@ public class InvitationManager {
             if (StringUtils.isBlank(cfg.getInvite().getExpiration().getResolveTo())) {
                 String localpart = cfg.getAppsvc().getUser().getInviteExpired();
                 if (StringUtils.isBlank(localpart)) {
-                    throw new ConfigurationException("Could not compute the Invitation expiration resolution target from App service user: not set");
+                    throw new ConfigurationException(
+                        "Could not compute the Invitation expiration resolution target from App service user: not set");
                 }
 
                 cfg.getInvite().getExpiration().setResolveTo(MatrixID.asAcceptable(localpart, cfg.getMatrix().getDomain()).getId());
@@ -198,7 +209,8 @@ public class InvitationManager {
     }
 
     private String getIdForLog(IThreePidInviteReply reply) {
-        return reply.getInvite().getSender().getId() + ":" + reply.getInvite().getRoomId() + ":" + reply.getInvite().getMedium() + ":" + reply.getInvite().getAddress();
+        return reply.getInvite().getSender().getId() + ":" + reply.getInvite().getRoomId() + ":" + reply.getInvite()
+            .getMedium() + ":" + reply.getInvite().getAddress();
     }
 
     private Optional<SingleLookupReply> lookup3pid(String medium, String address) {
@@ -252,13 +264,16 @@ public class InvitationManager {
         }
 
         String invId = computeId(invitation);
-        log.info("Handling invite for {}:{} from {} in room {}", invitation.getMedium(), invitation.getAddress(), invitation.getSender(), invitation.getRoomId());
+        log.info("Handling invite for {}:{} from {} in room {}", invitation.getMedium(), invitation.getAddress(), invitation.getSender(),
+            invitation.getRoomId());
         IThreePidInviteReply reply = invitations.get(invId);
         if (reply != null) {
             log.info("Invite is already pending for {}:{}, returning data", invitation.getMedium(), invitation.getAddress());
             if (!StringUtils.equals(invitation.getRoomId(), reply.getInvite().getRoomId())) {
-                log.info("Sending new notification as new invite room {} is different from the original {}", invitation.getRoomId(), reply.getInvite().getRoomId());
-                notifMgr.sendForReply(new ThreePidInviteReply(reply.getId(), invitation, reply.getToken(), reply.getDisplayName(), reply.getPublicKeys()));
+                log.info("Sending new notification as new invite room {} is different from the original {}", invitation.getRoomId(),
+                    reply.getInvite().getRoomId());
+                notifMgr.sendForReply(
+                    new ThreePidInviteReply(reply.getId(), invitation, reply.getToken(), reply.getDisplayName(), reply.getPublicKeys()));
             } else {
                 // FIXME we should check attempt and send if bigger
             }
@@ -295,7 +310,8 @@ public class InvitationManager {
         log.info("Storing invite under ID {}", invId);
         storage.insertInvite(reply);
         invitations.put(invId, reply);
-        log.info("A new invite has been created for {}:{} on HS {}", invitation.getMedium(), invitation.getAddress(), invitation.getSender().getDomain());
+        log.info("A new invite has been created for {}:{} on HS {}", invitation.getMedium(), invitation.getAddress(),
+            invitation.getSender().getDomain());
 
         return reply;
     }
@@ -385,8 +401,10 @@ public class InvitationManager {
     public void publishMappingIfInvited(ThreePidMapping threePid) {
         log.info("Looking up possible pending invites for {}:{}", threePid.getMedium(), threePid.getValue());
         for (IThreePidInviteReply reply : invitations.values()) {
-            if (StringUtils.equalsIgnoreCase(reply.getInvite().getMedium(), threePid.getMedium()) && StringUtils.equalsIgnoreCase(reply.getInvite().getAddress(), threePid.getValue())) {
-                log.info("{}:{} has an invite pending on HS {}, publishing mapping", threePid.getMedium(), threePid.getValue(), reply.getInvite().getSender().getDomain());
+            if (StringUtils.equalsIgnoreCase(reply.getInvite().getMedium(), threePid.getMedium()) && StringUtils
+                .equalsIgnoreCase(reply.getInvite().getAddress(), threePid.getValue())) {
+                log.info("{}:{} has an invite pending on HS {}, publishing mapping", threePid.getMedium(), threePid.getValue(),
+                    reply.getInvite().getSender().getDomain());
                 publishMapping(reply, threePid.getMxid());
             }
         }

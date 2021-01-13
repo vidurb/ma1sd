@@ -67,6 +67,7 @@ public class InvitationConfig {
 
         private boolean recursive = true;
         private long timer = 5;
+        private PeriodDimension period = PeriodDimension.minutes;
 
         public boolean isRecursive() {
             return recursive;
@@ -84,6 +85,13 @@ public class InvitationConfig {
             this.timer = timer;
         }
 
+        public PeriodDimension getPeriod() {
+            return period;
+        }
+
+        public void setPeriod(PeriodDimension period) {
+            this.period = period;
+        }
     }
 
     public static class SenderPolicy {
@@ -147,4 +155,10 @@ public class InvitationConfig {
         log.info("Policies: {}", GsonUtil.get().toJson(getPolicy()));
     }
 
+    public enum PeriodDimension {
+
+        minutes,
+
+        seconds
+    }
 }

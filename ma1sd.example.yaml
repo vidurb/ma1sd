@@ -204,3 +204,10 @@ threepid:
 #   root: error     # default level for all loggers (apps and thirdparty libraries)
 #   app: info       # log level only for the ma1sd
 #   requests: false # or true to dump full requests and responses
+
+
+# Config invitation manager
+#invite:
+#  resolution:
+#    timer: 10
+#    period: seconds # search invites every 10 seconds (by default 5 minutes)
