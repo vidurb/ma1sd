@@ -23,6 +23,7 @@ package io.kamax.mxisd.http.undertow.handler;
 import io.kamax.mxisd.auth.AccountManager;
 import io.kamax.mxisd.config.PolicyConfig;
 import io.kamax.mxisd.exception.InvalidCredentialsException;
+import io.kamax.mxisd.exception.TermsNotSignedException;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
@@ -66,7 +67,7 @@ public class CheckTermsHandler extends BasicHttpHandler {
 
         if (!accountManager.isTermAccepted(token, policies)) {
             log.error("Non accepting request from: {}", exchange.getHostAndPort());
-            throw new InvalidCredentialsException();
+            throw new TermsNotSignedException();
         }
         log.trace("Access granted");
         child.handleRequest(exchange);

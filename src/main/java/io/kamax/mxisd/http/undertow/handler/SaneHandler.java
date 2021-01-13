@@ -83,6 +83,8 @@ public class SaneHandler extends BasicHttpHandler {
                 respond(exchange, HttpStatus.SC_BAD_REQUEST, e.getErrorCode(), e.getError());
             } catch (InvalidCredentialsException e) {
                 respond(exchange, HttpStatus.SC_UNAUTHORIZED, "M_UNAUTHORIZED", e.getMessage());
+            } catch (TermsNotSignedException e) {
+                respond(exchange, HttpStatus.SC_FORBIDDEN, "M_TERMS_NOT_SIGNED", e.getMessage());
             } catch (ObjectNotFoundException e) {
                 respond(exchange, HttpStatus.SC_NOT_FOUND, "M_NOT_FOUND", e.getMessage());
             } catch (NotImplementedException e) {
