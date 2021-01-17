@@ -123,6 +123,7 @@ public class InvitationConfig {
     private Expiration expiration = new Expiration();
     private Resolution resolution = new Resolution();
     private Policies policy = new Policies();
+    private boolean fullDisplayName = false;
 
     public Expiration getExpiration() {
         return expiration;
@@ -148,11 +149,20 @@ public class InvitationConfig {
         this.policy = policy;
     }
 
+    public boolean isFullDisplayName() {
+        return fullDisplayName;
+    }
+
+    public void setFullDisplayName(boolean fullDisplayName) {
+        this.fullDisplayName = fullDisplayName;
+    }
+
     public void build() {
         log.info("--- Invite config ---");
         log.info("Expiration: {}", GsonUtil.get().toJson(getExpiration()));
         log.info("Resolution: {}", GsonUtil.get().toJson(getResolution()));
         log.info("Policies: {}", GsonUtil.get().toJson(getPolicy()));
+        log.info("Print full display name on invitation: {}", isFullDisplayName());
     }
 
     public enum PeriodDimension {

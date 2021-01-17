@@ -208,6 +208,7 @@ threepid:
 
 # Config invitation manager
 #invite:
+#  fullDisplayName: true # print full name of the invited user (default false)
 #  resolution:
 #    timer: 10
 #    period: seconds # search invites every 10 seconds (by default 5 minutes)

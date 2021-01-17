@@ -287,7 +287,7 @@ public class InvitationManager {
         }
 
         String token = RandomStringUtils.randomAlphanumeric(64);
-        String displayName = invitation.getAddress().substring(0, 3) + "...";
+        String displayName = getInvitedDisplayName(invitation.getAddress());
         KeyIdentifier pKeyId = keyMgr.getServerSigningKey().getId();
         KeyIdentifier eKeyId = keyMgr.generateKey(KeyType.Ephemeral);
 
@@ -314,6 +314,14 @@ public class InvitationManager {
             invitation.getSender().getDomain());
 
         return reply;
+    }
+
+    private String getInvitedDisplayName(String origin) {
+        if (cfg.isFullDisplayName()) {
+            return origin;
+        } else {
+            return origin.substring(0, 3) + "...";
+        }
     }
 
     public boolean hasInvite(ThreePid tpid) {
