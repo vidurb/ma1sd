@@ -212,3 +212,8 @@ threepid:
 #  resolution:
 #    timer: 10
 #    period: seconds # search invites every 10 seconds (by default 5 minutes)
+
+
+# Internal API
+#internal:
+#  enabled: true # default to false

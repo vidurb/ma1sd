@@ -118,6 +118,7 @@ public class MxisdConfig {
     private PolicyConfig policy = new PolicyConfig();
     private HashingConfig hashing = new HashingConfig();
     private LoggingConfig logging = new LoggingConfig();
+    private InternalAPIConfig internal = new InternalAPIConfig();
 
     public AppServiceConfig getAppsvc() {
         return appsvc;
@@ -358,6 +359,14 @@ public class MxisdConfig {
         return this;
     }
 
+    public InternalAPIConfig getInternal() {
+        return internal;
+    }
+
+    public void setInternal(InternalAPIConfig internal) {
+        this.internal = internal;
+    }
+
     public MxisdConfig build() {
         getLogging().build();
 
@@ -394,6 +403,7 @@ public class MxisdConfig {
         getWordpress().build();
         getPolicy().build();
         getHashing().build(getMatrix());
+        getInternal().build();
 
         return this;
     }

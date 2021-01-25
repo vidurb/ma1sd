@@ -58,6 +58,7 @@ import io.kamax.mxisd.http.undertow.handler.identity.v1.BulkLookupHandler;
 import io.kamax.mxisd.http.undertow.handler.identity.v1.SingleLookupHandler;
 import io.kamax.mxisd.http.undertow.handler.identity.v2.HashDetailsHandler;
 import io.kamax.mxisd.http.undertow.handler.identity.v2.HashLookupHandler;
+import io.kamax.mxisd.http.undertow.handler.internal.InternalInviteManagerHandler;
 import io.kamax.mxisd.http.undertow.handler.invite.v1.RoomInviteHandler;
 import io.kamax.mxisd.http.undertow.handler.profile.v1.InternalProfileHandler;
 import io.kamax.mxisd.http.undertow.handler.profile.v1.ProfileHandler;
@@ -147,6 +148,11 @@ public class HttpMxisd {
         termsEndpoints(handler);
         hashEndpoints(handler);
         accountEndpoints(handler);
+
+        if (m.getConfig().getInternal().isEnabled()) {
+            handler.get(InternalInviteManagerHandler.PATH, new InternalInviteManagerHandler(m.getInvite()));
+        }
+
         ServerConfig serverConfig = m.getConfig().getServer();
         httpSrv = Undertow.builder().addHttpListener(serverConfig.getPort(), serverConfig.getHostname()).setHandler(handler).build();
 
