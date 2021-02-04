@@ -33,6 +33,7 @@ import io.kamax.mxisd.util.RestClientUtils;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.form.FormData;
+import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -203,25 +204,33 @@ public abstract class BasicHttpHandler implements HttpHandler {
     }
 
     protected void proxyPost(HttpServerExchange exchange, JsonObject body, CloseableHttpClient client, ClientDnsOverwrite dns) {
+        proxyPost(exchange, body, client, dns, false);
+    }
+
+    protected void proxyPost(HttpServerExchange exchange, JsonObject body, CloseableHttpClient client, ClientDnsOverwrite dns,
+                             boolean defaultJsonResponse) {
         String target = dns.transform(URI.create(exchange.getRequestURL())).toString();
         log.info("Requesting remote: {}", target);
         HttpPost req = RestClientUtils.post(target, GsonUtil.get(), body);
 
-        exchange.getRequestHeaders().forEach(header -> {
-            header.forEach(v -> {
-                String name = header.getHeaderName().toString();
-                if (!StringUtils.startsWithIgnoreCase(name, "content-")) {
-                    req.addHeader(name, v);
-                }
-            });
-        });
+        exchange.getRequestHeaders().forEach(header -> header.forEach(v -> {
+            String name = header.getHeaderName().toString();
+            if (!StringUtils.startsWithIgnoreCase(name, "content-")) {
+                req.addHeader(name, v);
+            }
+        }));
 
+        boolean missingJsonResponse = true;
         try (CloseableHttpResponse res = client.execute(req)) {
             exchange.setStatusCode(res.getStatusLine().getStatusCode());
             for (Header h : res.getAllHeaders()) {
                 for (HeaderElement el : h.getElements()) {
+                    missingJsonResponse = !Headers.CONTENT_TYPE_STRING.equalsIgnoreCase(h.getName());
                     exchange.getResponseHeaders().add(HttpString.tryFromString(h.getName()), el.getValue());
                 }
+            }
+            if (defaultJsonResponse && missingJsonResponse) {
+                exchange.getRequestHeaders().add(Headers.CONTENT_TYPE, "application/json");
             }
             res.getEntity().writeTo(exchange.getOutputStream());
             exchange.endExchange();

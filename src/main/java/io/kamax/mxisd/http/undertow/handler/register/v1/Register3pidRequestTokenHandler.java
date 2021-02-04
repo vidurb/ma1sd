@@ -71,7 +71,7 @@ public class Register3pidRequestTokenHandler extends BasicHttpHandler {
             throw new NotAllowedException("Your " + medium + " address cannot be used for registration");
         }
 
-        proxyPost(exchange, body, client, dns);
+        proxyPost(exchange, body, client, dns, true);
     }
 
 }
