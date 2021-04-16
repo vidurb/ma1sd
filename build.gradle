@@ -78,7 +78,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.38.0'
     }
 }
@@ -92,18 +92,18 @@ dependencies {
     api 'org.slf4j:slf4j-simple:1.7.25'
 
     // Easy file management
-    api 'commons-io:commons-io:2.6'
+    api 'commons-io:commons-io:2.8.0'
 
     // Config management
-    api 'org.yaml:snakeyaml:1.25'
+    api 'org.yaml:snakeyaml:1.28'
 
     // Dependencies from old Matrix-java-sdk
-    api 'org.apache.commons:commons-lang3:3.9'
+    api 'org.apache.commons:commons-lang3:3.12.0'
     api 'com.squareup.okhttp3:okhttp:4.2.2'
-    api 'commons-codec:commons-codec:1.13'
+    api 'commons-codec:commons-codec:1.15'
 
     // ORMLite
-    api 'com.j256.ormlite:ormlite-jdbc:5.1'
+    api 'com.j256.ormlite:ormlite-jdbc:5.3'
 
     // ed25519 handling
     api 'net.i2p.crypto:eddsa:0.3.0'
@@ -115,10 +115,10 @@ dependencies {
     api 'dnsjava:dnsjava:2.1.9'
 
     // HTTP connections
-    api 'org.apache.httpcomponents:httpclient:4.5.10'
+    api 'org.apache.httpcomponents:httpclient:4.5.13'
 
     // Phone numbers validation
-    api 'com.googlecode.libphonenumber:libphonenumber:8.10.22'
+    api 'com.googlecode.libphonenumber:libphonenumber:8.12.21'
 
     // E-mail sending
     api 'javax.mail:javax.mail-api:1.6.2'
@@ -128,19 +128,19 @@ dependencies {
     api 'com.google.firebase:firebase-admin:5.3.0'
 
     // Connection Pool
-    api 'com.mchange:c3p0:0.9.5.4'
+    api 'com.mchange:c3p0:0.9.5.5'
 
     // SQLite
-    api 'org.xerial:sqlite-jdbc:3.28.0'
+    api 'org.xerial:sqlite-jdbc:3.34.0'
 
     // PostgreSQL
-    api 'org.postgresql:postgresql:42.2.8'
+    api 'org.postgresql:postgresql:42.2.19'
 
     // MariaDB/MySQL
-    api 'org.mariadb.jdbc:mariadb-java-client:2.5.1'
+    api 'org.mariadb.jdbc:mariadb-java-client:2.7.2'
 
     // UNIX sockets
-    api 'com.kohlschutter.junixsocket:junixsocket-core:2.3.2'
+    api 'com.kohlschutter.junixsocket:junixsocket-core:2.3.3'
 
     // Twilio SDK for SMS
     api 'com.twilio.sdk:twilio:7.45.0'
@@ -149,16 +149,16 @@ dependencies {
     api 'com.sendgrid:sendgrid-java:2.2.2'
 
     // ZT-Exec for exec identity store
-    api 'org.zeroturnaround:zt-exec:1.11'
+    api 'org.zeroturnaround:zt-exec:1.12'
 
     // HTTP server
-    api 'io.undertow:undertow-core:2.0.27.Final'
+    api 'io.undertow:undertow-core:2.2.7.Final'
 
     // Command parser for AS interface
     api 'commons-cli:commons-cli:1.4'
 
-    testImplementation 'junit:junit:4.13-rc-1'
-    testImplementation 'com.github.tomakehurst:wiremock:2.25.1'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'com.github.tomakehurst:wiremock:2.27.2'
     testImplementation 'com.unboundid:unboundid-ldapsdk:4.0.12'
     testImplementation 'com.icegreen:greenmail:1.5.11'
 }
@@ -243,7 +243,7 @@ task debBuild(dependsOn: shadowJar) {
 
         ant.chmod(
                 file: "${debBuildDebianPath}/postinst",
-                perm: 'a+x'
+                perm: '0755'
         )
 
         ant.chmod(
