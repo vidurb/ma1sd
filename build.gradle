@@ -20,7 +20,7 @@
 
 import java.util.regex.Pattern
 
-apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'application'
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'idea'
@@ -73,93 +73,94 @@ String gitVersion() {
 
 buildscript {
     repositories {
-        jcenter()
+        gradlePluginPortal()
+        mavenCentral()
     }
 
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:5.1.0'
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.27.0'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.38.0'
     }
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
     // Logging
-    compile 'org.slf4j:slf4j-simple:1.7.25'
+    api 'org.slf4j:slf4j-simple:1.7.25'
 
     // Easy file management
-    compile 'commons-io:commons-io:2.6'
+    api 'commons-io:commons-io:2.6'
 
     // Config management
-    compile 'org.yaml:snakeyaml:1.25'
+    api 'org.yaml:snakeyaml:1.25'
 
     // Dependencies from old Matrix-java-sdk
-    compile 'org.apache.commons:commons-lang3:3.9'
-    compile 'com.squareup.okhttp3:okhttp:4.2.2'
-    compile 'commons-codec:commons-codec:1.13'
+    api 'org.apache.commons:commons-lang3:3.9'
+    api 'com.squareup.okhttp3:okhttp:4.2.2'
+    api 'commons-codec:commons-codec:1.13'
 
     // ORMLite
-    compile 'com.j256.ormlite:ormlite-jdbc:5.1'
+    api 'com.j256.ormlite:ormlite-jdbc:5.1'
 
     // ed25519 handling
-    compile 'net.i2p.crypto:eddsa:0.3.0'
+    api 'net.i2p.crypto:eddsa:0.3.0'
 
     // LDAP connector
-    compile 'org.apache.directory.api:api-all:1.0.3'
+    api 'org.apache.directory.api:api-all:1.0.3'
 
     // DNS lookups
-    compile 'dnsjava:dnsjava:2.1.9'
+    api 'dnsjava:dnsjava:2.1.9'
 
     // HTTP connections
-    compile 'org.apache.httpcomponents:httpclient:4.5.10'
+    api 'org.apache.httpcomponents:httpclient:4.5.10'
 
     // Phone numbers validation
-    compile 'com.googlecode.libphonenumber:libphonenumber:8.10.22'
+    api 'com.googlecode.libphonenumber:libphonenumber:8.10.22'
 
     // E-mail sending
-    compile 'javax.mail:javax.mail-api:1.6.2'
-    compile 'com.sun.mail:javax.mail:1.6.2'
+    api 'javax.mail:javax.mail-api:1.6.2'
+    api 'com.sun.mail:javax.mail:1.6.2'
 
     // Google Firebase Authentication backend
-    compile 'com.google.firebase:firebase-admin:5.3.0'
+    api 'com.google.firebase:firebase-admin:5.3.0'
 
     // Connection Pool
-    compile 'com.mchange:c3p0:0.9.5.4'
+    api 'com.mchange:c3p0:0.9.5.4'
 
     // SQLite
-    compile 'org.xerial:sqlite-jdbc:3.28.0'
+    api 'org.xerial:sqlite-jdbc:3.28.0'
 
     // PostgreSQL
-    compile 'org.postgresql:postgresql:42.2.8'
+    api 'org.postgresql:postgresql:42.2.8'
 
     // MariaDB/MySQL
-    compile 'org.mariadb.jdbc:mariadb-java-client:2.5.1'
-    
+    api 'org.mariadb.jdbc:mariadb-java-client:2.5.1'
+
     // UNIX sockets
-    compile 'com.kohlschutter.junixsocket:junixsocket-core:2.3.2'
+    api 'com.kohlschutter.junixsocket:junixsocket-core:2.3.2'
 
     // Twilio SDK for SMS
-    compile 'com.twilio.sdk:twilio:7.45.0'
+    api 'com.twilio.sdk:twilio:7.45.0'
 
     // SendGrid SDK to send emails from GCE
-    compile 'com.sendgrid:sendgrid-java:2.2.2'
+    api 'com.sendgrid:sendgrid-java:2.2.2'
 
     // ZT-Exec for exec identity store
-    compile 'org.zeroturnaround:zt-exec:1.11'
+    api 'org.zeroturnaround:zt-exec:1.11'
 
     // HTTP server
-    compile 'io.undertow:undertow-core:2.0.27.Final'
+    api 'io.undertow:undertow-core:2.0.27.Final'
 
     // Command parser for AS interface
-    implementation 'commons-cli:commons-cli:1.4'
+    api 'commons-cli:commons-cli:1.4'
 
-    testCompile 'junit:junit:4.13-rc-1'
-    testCompile 'com.github.tomakehurst:wiremock:2.25.1'
-    testCompile 'com.unboundid:unboundid-ldapsdk:4.0.12'
-    testCompile 'com.icegreen:greenmail:1.5.11'
+    testImplementation 'junit:junit:4.13-rc-1'
+    testImplementation 'com.github.tomakehurst:wiremock:2.25.1'
+    testImplementation 'com.unboundid:unboundid-ldapsdk:4.0.12'
+    testImplementation 'com.icegreen:greenmail:1.5.11'
 }
 
 jar {
